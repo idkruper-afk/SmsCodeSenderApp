@@ -9,13 +9,66 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <!-- Header Bar with Title and Top-Right Settings Button -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SMS Code Keypad"
-            android:textSize="22sp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="SMS Code Keypad"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnTopRightSettings"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙ Settings"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvPermissionStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Checking SMS Permission..."
             android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/layoutPermissionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnGrantPermission"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Grant SMS Permission"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnAppSettings"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Open App Settings"
+                android:textAllCaps="false" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvStatus"
@@ -25,22 +78,9 @@
             android:textSize="13sp"
             android:layout_marginBottom="16dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Target Mobile Number (e.g., +447700900077)">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPhoneNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="phone" />
-        </com.google.android.material.textfield.TextInputLayout>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_marginBottom="8dp"
             android:text="Quick Code Buttons (Long-Press to Edit)"
             android:textStyle="bold" />
@@ -56,7 +96,7 @@
             <Button
                 android:id="@+id/btnCode1"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 1"
@@ -65,7 +105,7 @@
             <Button
                 android:id="@+id/btnCode2"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 2"
@@ -74,7 +114,7 @@
             <Button
                 android:id="@+id/btnCode3"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 3"
@@ -83,7 +123,7 @@
             <Button
                 android:id="@+id/btnCode4"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 4"
@@ -92,7 +132,7 @@
             <Button
                 android:id="@+id/btnCode5"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 5"
@@ -101,47 +141,12 @@
             <Button
                 android:id="@+id/btnCode6"
                 android:layout_width="0dp"
-                android:layout_height="72dp"
+                android:layout_height="84dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="6dp"
                 android:text="Code 6"
                 android:textAllCaps="false" />
         </GridLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="8dp"
-            android:text="Custom Code"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Enter custom SMS code">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCustomCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Button
-                android:id="@+id/btnSendCustom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Send" />
-        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

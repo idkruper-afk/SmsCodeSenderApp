@@ -9,9 +9,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.telephony.SmsManager
+import android.text.InputType
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -21,14 +26,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doAfterTextChanged
-import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var etPhoneNumber: TextInputEditText
-    private lateinit var etCustomCode: TextInputEditText
     private lateinit var tvStatus: TextView
+    private lateinit var tvPermissionStatus: TextView
+    private lateinit var layoutPermissionButtons: LinearLayout
     private lateinit var prefs: SharedPreferences
 
     private val defaultLabels = listOf(
@@ -74,14 +77,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         prefs = getSharedPreferences("SmsCodePrefs", Context.MODE_PRIVATE)
-        etPhoneNumber = findViewById(R.id.etPhoneNumber)
-        etCustomCode = findViewById(R.id.etCustomCode)
         tvStatus = findViewById(R.id.tvStatus)
+        tvPermissionStatus = findViewById(R.id.tvPermissionStatus)
+        layoutPermissionButtons = findViewById(R.id.layoutPermissionButtons)
 
-        // Restore saved phone number
-        etPhoneNumber.setText(prefs.getString("saved_phone", ""))
-        etPhoneNumber.doAfterTextChanged { text ->
-            prefs.edit().putString("saved_phone", text?.toString()?.trim() ?: "").apply()
+        findViewById<Button>(R.id.btnTopRightSettings).setOnClickListener {
+            showSettingsDialog()
+        }
+
+        findViewById<Button>(R.id.btnGrantPermission).setOnClickListener {
+            requestSmsPermissions()
+        }
+
+        findViewById<Button>(R.id.btnAppSettings).setOnClickListener {
+            openAppSettings()
         }
 
         val buttonIds = listOf(
@@ -104,20 +113,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.btnSendCustom).setOnClickListener {
-            val customCode = etCustomCode.text?.toString()?.trim() ?: ""
-            if (customCode.isEmpty()) {
-                Toast.makeText(this, "Enter a custom code first", Toast.LENGTH_SHORT).show()
-            } else {
-                sendSmsCode(customCode)
-            }
-        }
-
-        requestSmsPermissionIfNeeded()
+        updatePermissionBanner()
+        requestSmsPermissions()
     }
 
     override fun onResume() {
         super.onResume()
+        updatePermissionBanner()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(smsSentReceiver, IntentFilter(SMS_SENT_ACTION), Context.RECEIVER_NOT_EXPORTED)
         } else {
@@ -130,6 +132,98 @@ class MainActivity : AppCompatActivity() {
         try {
             unregisterReceiver(smsSentReceiver)
         } catch (_: Exception) {}
+    }
+
+    private fun getSavedPhoneNumber(): String =
+        prefs.getString("saved_phone", "")?.trim() ?: ""
+
+    private fun showSettingsDialog() {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(56, 32, 56, 16)
+        }
+
+        val infoText = TextView(this).apply {
+            text = "Target Mobile Number:"
+            textSize = 14f
+            setPadding(0, 0, 0, 12)
+        }
+
+        val inputPhone = EditText(this).apply {
+            hint = "e.g., +447700900077"
+            inputType = InputType.TYPE_CLASS_PHONE
+            setText(getSavedPhoneNumber())
+        }
+
+        container.addView(infoText)
+        container.addView(inputPhone)
+
+        AlertDialog.Builder(this)
+            .setTitle("Settings")
+            .setView(container)
+            .setPositiveButton("Save") { _, _ ->
+                val newPhone = inputPhone.text.toString().trim()
+                prefs.edit().putString("saved_phone", newPhone).apply()
+                Toast.makeText(this, "Target mobile number saved", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("App Permissions") { _, _ ->
+                openAppSettings()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun hasSmsPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun updatePermissionBanner() {
+        if (hasSmsPermission()) {
+            tvPermissionStatus.text = "✓ SMS Permission Granted (Ready to Send)"
+            tvPermissionStatus.setTextColor(Color.parseColor("#2E7D32"))
+            layoutPermissionButtons.visibility = View.GONE
+        } else {
+            tvPermissionStatus.text = "⚠ SMS Permission Required — Tap below to grant:"
+            tvPermissionStatus.setTextColor(Color.parseColor("#C62828"))
+            layoutPermissionButtons.visibility = View.VISIBLE
+        }
+    }
+
+    private fun requestSmsPermissions() {
+        val perms = arrayOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_PHONE_STATE
+        )
+        ActivityCompat.requestPermissions(this, perms, REQ_SEND_SMS)
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        startActivity(intent)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        updatePermissionBanner()
+        if (requestCode == REQ_SEND_SMS && !hasSmsPermission()) {
+            AlertDialog.Builder(this)
+                .setTitle("Enable SMS Permission")
+                .setMessage(
+                    "If Android blocked the permission popup with 'Restricted setting' (common on Android 13+):\n\n" +
+                    "1. Tap 'Open Settings' below.\n" +
+                    "2. Tap the 3 dots (⋮) in the top-right corner and select 'Allow restricted settings'.\n" +
+                    "3. Tap 'Permissions' -> 'SMS' -> 'Allow'."
+                )
+                .setPositiveButton("Open Settings") { _, _ -> openAppSettings() }
+                .setNegativeButton("Close", null)
+                .show()
+        }
     }
 
     private fun getLabel(index: Int): String =
@@ -180,16 +274,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendSmsCode(code: String) {
-        val phone = etPhoneNumber.text?.toString()?.trim() ?: ""
+        val phone = getSavedPhoneNumber()
         if (phone.isEmpty()) {
-            Toast.makeText(this, "Please enter a target mobile number first", Toast.LENGTH_SHORT).show()
-            etPhoneNumber.requestFocus()
+            Toast.makeText(this, "Set the target mobile number in Settings first", Toast.LENGTH_SHORT).show()
+            showSettingsDialog()
             return
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS), REQ_SEND_SMS)
-            Toast.makeText(this, "Grant SMS permission and tap the button again", Toast.LENGTH_SHORT).show()
+        if (!hasSmsPermission()) {
+            requestSmsPermissions()
             return
         }
 
@@ -212,17 +305,11 @@ class MainActivity : AppCompatActivity() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            tvStatus.text = "Sending '$code' to $phone..."
+            tvStatus.text = "Sending '$code'..."
             smsManager.sendTextMessage(phone, null, code, pendingIntent, null)
         } catch (e: Exception) {
             tvStatus.text = "Error: ${e.localizedMessage}"
             Toast.makeText(this, "Failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun requestSmsPermissionIfNeeded() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS), REQ_SEND_SMS)
         }
     }
 }

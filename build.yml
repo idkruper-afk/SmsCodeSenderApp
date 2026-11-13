@@ -24,10 +24,12 @@ jobs:
 
       - name: Build Debug APK
         run: |
-          if [ -f "settings.gradle.kts" ]; then
-            gradle assembleDebug
-          elif [ -f "SmsCodeSenderApp/settings.gradle.kts" ]; then
-            cd SmsCodeSenderApp && gradle assembleDebug
+          if ls *.zip 1> /dev/null 2>&1; then
+            unzip -o *.zip
+          fi
+          PROJECT_FILE=$(find . -name "settings.gradle.kts" | head -n 1)
+          if [ -n "$PROJECT_FILE" ]; then
+            cd "$(dirname "$PROJECT_FILE")" && gradle assembleDebug
           else
             echo "Could not find settings.gradle.kts!"
             exit 1
