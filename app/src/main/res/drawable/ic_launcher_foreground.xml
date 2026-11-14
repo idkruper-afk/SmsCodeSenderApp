@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer metallic metallic border visual -->
+    <path
+        android:pathData="M30,22 h48 a8,8 0 0,1 8,8 v48 a8,8 0 0,1 -8,8 h-48 a8,8 0 0,1 -8,-8 v-48 a8,8 0 0,1 8,-8 z"
+        android:strokeColor="#738290"
+        android:strokeWidth="1.5"
+        android:fillColor="#222b35" />
+
+    <!-- Cellular signal / Automation gear (visual only with geometric vectors) -->
+    <path
+        android:pathData="M65,35 A7,7 0 0,1 77,35"
+        android:strokeColor="#00bfff"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M61,31 A13,13 0 0,1 81,31"
+        android:strokeColor="#00e5ff"
+        android:strokeWidth="2.0" />
+
+    <!-- Digital Envelope / Message Overlays -->
+    <path
+        android:pathData="M52,43h12v7h-12z"
+        android:strokeColor="#00ffd2"
+        android:strokeWidth="1" />
+    <path
+        android:pathData="M52,43l6,3.5l6,-3.5"
+        android:strokeColor="#00ffd2"
+        android:strokeWidth="1" />
+
+    <!-- Stylized remote fob control overlay (image_1.png inspired hardware graphic) -->
+    <path
+        android:pathData="M40,38 M45,34 h-10 a5,5 0 0,0 -5,5 v26 a5,5 0 0,0 5,5 h10 a5,5 0 0,0 5,-5 v-26 a5,5 0 0,0 -5,-5 z"
+        android:fillColor="#151b26"
+        android:strokeColor="#00bfff"
+        android:strokeWidth="2.5" />
+    
+    <!-- Lock symbol inner details on Keyfob -->
+    <path
+        android:pathData="M40,43 h-2 v3 h4 v-3 z"
+        android:fillColor="#ffffff" />
+    <path
+        android:pathData="M39,41 A1,1 0 0,1 41,41 v2 h-2 z"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="0.8" />
+
+    <!-- Button 1 on remote fob -->
+    <path
+        android:pathData="M33,52h14v1h-14z"
+        android:fillColor="#00e5ff" />
+    
+    <!-- Keypad numeric grid on the right side of foreground squircle -->
+    <path
+        android:pathData="M54,54h12v6h-12z M68,54h12v6h-12z M54,62h12v6h-12z M68,62h12v6h-12z M54,70h12v6h-12z M68,70h12v6h-12z"
+        android:fillColor="#34424f"
+        android:strokeColor="#738290"
+        android:strokeWidth="0.8" />
+
+</vector>

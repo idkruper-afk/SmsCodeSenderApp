@@ -31,7 +31,7 @@ jobs:
           if [ -n "$PROJECT_FILE" ]; then
             cd "$(dirname "$PROJECT_FILE")" && gradle assembleDebug
           else
-            echo "Could not find settings.gradle.kts!"
+            echo "No Android project files found!"
             exit 1
           fi
 

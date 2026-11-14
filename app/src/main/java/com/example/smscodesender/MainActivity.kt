@@ -191,8 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestSmsPermissions() {
         val perms = arrayOf(
-            Manifest.permission.SEND_SMS,
-            Manifest.permission.READ_PHONE_STATE
+            Manifest.permission.SEND_SMS
         )
         ActivityCompat.requestPermissions(this, perms, REQ_SEND_SMS)
     }
